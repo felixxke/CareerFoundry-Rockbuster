@@ -1,0 +1,50 @@
+--Top 10 Customers of Rockbuster
+
+WITH top_countries (country_id, country, count) AS
+	(SELECT E.country_id,
+	 		E.country,
+	 		COUNT(customer_id)
+	 FROM customer B
+	 INNER JOIN address C ON B.address_id = C.address_id
+	 INNER JOIN city D ON C.city_id = D.city_id
+	 INNER JOIN country E ON D.country_id = E.country_id
+	 GROUP BY E.country_id,
+	 		  E.country
+	 ORDER BY COUNT(customer_id) DESC
+	 LIMIT 10
+	),
+
+top_cities (country, city, count) AS
+	(SELECT E.country,
+	 		D.city,
+	 		COUNT(customer_id)
+	 FROM customer B
+	 INNER JOIN address C ON B.address_id = C.address_id
+	 INNER JOIN city D ON C.city_id = D.city_id
+	 INNER JOIN country E ON D.country_id = E.country_id
+	 INNER JOIN top_countries F ON E.country_id = F.country_id
+	 GROUP BY E.country,
+	 		  D.city
+	 ORDER BY COUNT(customer_id) DESC
+	 LIMIT 10
+	)
+
+SELECT B.customer_id,
+	   B.first_name,
+	   B.last_name,
+	   E.country,
+	   D.city,
+	   SUM(amount)
+FROM payment A
+INNER JOIN customer B ON A.customer_id = B.customer_id
+INNER JOIN address C ON B.address_id = C.address_id
+INNER JOIN city D ON C.city_id = D.city_id
+INNER JOIN country E ON D.country_id = E.country_id
+INNER JOIN top_cities G ON D.city = G.city
+GROUP BY B.customer_id,
+		 B.first_name,
+		 B.last_name,
+		 E.country,
+		 D.city
+ORDER BY SUM(amount) DESC
+LIMIT 10
