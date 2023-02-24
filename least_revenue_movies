@@ -1,0 +1,13 @@
+--Least Revenue Movies
+
+SELECT A.film_id,
+	   A.title,
+	   COUNT(*)
+FROM film A
+FULL JOIN inventory B ON A.film_id = B.film_id
+FULL JOIN rental C ON B.inventory_id = C.inventory_id
+FULL JOIN payment D ON C.rental_id = D.rental_id
+GROUP BY A.film_id,
+		 A.title
+HAVING COUNT(*) = 1
+ORDER BY SUM(amount) ASC
