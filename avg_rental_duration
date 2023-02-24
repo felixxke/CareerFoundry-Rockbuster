@@ -1,0 +1,4 @@
+--Average Rental Duration
+
+SELECT AVG(rental_duration)
+FROM film
